@@ -8,10 +8,13 @@ COPY public ./public
 RUN npm run build
 
 FROM python:3.12-slim
-RUN useradd --uid 10001 --create-home patchguard && mkdir /data
+RUN useradd --uid 10001 --create-home patchguard
+COPY backend/requirements.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir -r /tmp/requirements.txt
 WORKDIR /app
-COPY backend/server.py backend/remote_jobs.py backend/manage_user.py backend/render_start.py ./
+COPY backend/server.py backend/remote_jobs.py backend/manage_user.py backend/database.py backend/schema.sql ./
 COPY --from=frontend /app/dist /app/site
-ENV PATCHGUARD_HOST=0.0.0.0 PATCHGUARD_PORT=8787 PATCHGUARD_DB=/data/patchguard.sqlite3 PATCHGUARD_COOKIE_SECURE=1
+ENV PATCHGUARD_HOST=0.0.0.0 PATCHGUARD_PORT=8787 PATCHGUARD_REQUIRE_POSTGRES=1 PATCHGUARD_COOKIE_SECURE=1
 EXPOSE 8787
-CMD ["python", "render_start.py"]
+USER patchguard
+CMD ["python", "server.py"]

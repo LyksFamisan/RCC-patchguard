@@ -125,4 +125,18 @@ class RemoteJobsTest(unittest.TestCase):
         self.assertNotIn('claim_hash',records[0])
         self.assertNotIn('claimToken',records[0])
 
+    def test_failed_commit_never_reports_job_success(self):
+        from contextlib import contextmanager
+        from unittest.mock import patch
+        original = server.conn
+        @contextmanager
+        def failing_connection():
+            with original() as c:
+                yield c
+                raise RuntimeError('Simulated commit failure')
+        with patch.object(server, 'conn', failing_connection):
+            self.assertEqual(self.create()[0], 500)
+        with original() as c:
+            self.assertEqual(c.execute('SELECT count(*) FROM remote_jobs').fetchone()[0], 0)
+
 if __name__=='__main__':unittest.main()

@@ -1,10 +1,11 @@
-"""RCC PatchGuard local backend: Python 3.10+ standard library and SQLite."""
+"""RCC PatchGuard API: PostgreSQL in cloud hosting, SQLite for local development."""
 import os, json, sqlite3, secrets, hashlib, hmac, datetime, re, threading
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from http.cookies import SimpleCookie
 from urllib.parse import urlsplit
 from pathlib import Path
 import remote_jobs
+import database
 
 DB = Path(os.environ.get('PATCHGUARD_DB', str(Path(__file__).with_name('patchguard.sqlite3'))))
 HOST = os.environ.get('PATCHGUARD_HOST', '127.0.0.1')
@@ -17,20 +18,12 @@ def now(): return datetime.datetime.now(datetime.timezone.utc).isoformat()
 def digest(s): return hashlib.sha256(s.encode()).hexdigest()
 def password_hash(p, salt): return hashlib.pbkdf2_hmac('sha256',p.encode(),bytes.fromhex(salt),350000).hex()
 def conn():
- c=sqlite3.connect(DB,timeout=15); c.row_factory=sqlite3.Row; c.execute('PRAGMA foreign_keys=ON'); c.execute('PRAGMA journal_mode=WAL'); return c
+ return database.connect(DB)
 
 def init():
- DB.parent.mkdir(parents=True,exist_ok=True)
+ if not os.environ.get('DATABASE_URL'): DB.parent.mkdir(parents=True,exist_ok=True)
  with conn() as c:
-  c.executescript('''
-  CREATE TABLE IF NOT EXISTS users(id TEXT PRIMARY KEY,email TEXT UNIQUE NOT NULL,role TEXT NOT NULL,salt TEXT NOT NULL,password_hash TEXT NOT NULL);
-  CREATE TABLE IF NOT EXISTS sessions(token_hash TEXT PRIMARY KEY,user_id TEXT NOT NULL,expires TEXT NOT NULL);
-  CREATE TABLE IF NOT EXISTS enrollments(token_hash TEXT PRIMARY KEY,hostname TEXT NOT NULL,expires TEXT NOT NULL,used INTEGER DEFAULT 0);
-  CREATE TABLE IF NOT EXISTS devices(id TEXT PRIMARY KEY,hostname TEXT NOT NULL,os_name TEXT,os_version TEXT,os_build TEXT,architecture TEXT,agent_version TEXT,enrollment_status TEXT DEFAULT 'active',restart_status TEXT DEFAULT 'unknown',last_heartbeat_at TEXT,last_scan_at TEXT,created_at TEXT NOT NULL,token_hash TEXT UNIQUE NOT NULL);
-  CREATE TABLE IF NOT EXISTS scans(id TEXT PRIMARY KEY,asset_id TEXT NOT NULL,hostname TEXT,provider TEXT,started_at TEXT,completed_at TEXT,received_at TEXT,status TEXT,updates TEXT NOT NULL,FOREIGN KEY(asset_id) REFERENCES devices(id));
-  CREATE TABLE IF NOT EXISTS audit(id TEXT PRIMARY KEY,event TEXT NOT NULL,subject TEXT,at TEXT NOT NULL);
-  ''')
-  c.executescript(remote_jobs.SCHEMA)
+  c.executescript(Path(__file__).with_name('schema.sql').read_text())
   if ADMIN_EMAIL and ADMIN_PASSWORD:
    if len(ADMIN_PASSWORD)<14: raise RuntimeError('PATCHGUARD_ADMIN_PASSWORD must be at least 14 characters')
    if not c.execute('SELECT 1 FROM users WHERE email=?',(ADMIN_EMAIL.lower(),)).fetchone():
@@ -44,6 +37,8 @@ class Handler(BaseHTTPRequestHandler):
   # Never log URL parameters or credentials
   print('%s %s'%(self.address_string(),self.command),flush=True)
  def reply(self,status,obj,cookie=None):
+  if getattr(self,'_defer_reply',False):
+   self._pending_reply=(status,obj,cookie);return
   b=json.dumps(obj).encode(); self.send_response(status); self.send_header('Content-Type','application/json'); self.send_header('Cache-Control','no-store'); self.send_header('X-Content-Type-Options','nosniff')
   if cookie:self.send_header('Set-Cookie',cookie)
   self.send_header('Content-Length',str(len(b))); self.end_headers(); self.wfile.write(b)
@@ -63,6 +58,12 @@ class Handler(BaseHTTPRequestHandler):
   if not auth.startswith('Bearer '):return None
   return c.execute("SELECT * FROM devices WHERE token_hash=? AND enrollment_status='active'",(digest(auth[7:]),)).fetchone()
  def execute(self):
+  # Send success only after the database context has committed.
+  self._pending_reply=None;self._defer_reply=True
+  try:self.execute_request()
+  finally:self._defer_reply=False
+  if self._pending_reply:self.reply(*self._pending_reply)
+ def execute_request(self):
   path=urlsplit(self.path).path
   try:
    if self.command=='POST':

@@ -6,7 +6,7 @@ See [DEPLOYMENT.md](DEPLOYMENT.md) for the current persistent hosting setup, app
 
 # PatchGuard backend setup
 
-Requires Python 3.10+ and Node.js 22+. SQLite is created automatically. No Python packages required.
+Requires Python 3.10+ and Node.js 22+. Local SQLite is created automatically. Cloud PostgreSQL requires `python -m pip install -r backend/requirements.txt`. See [RENDER.md](RENDER.md) for Render Free + Neon Free.
 
 ## Local development (Mac or Windows)
 

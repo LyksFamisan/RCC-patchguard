@@ -6,7 +6,11 @@ The persistent Python API now supports a real Windows update job queue, independ
 
 Remote jobs are **disabled by default**. This is implementation code, not evidence of a deployed backend or a successful Windows installation. Linux HTTP integration tests cover authorization and delivery. The Windows worker must be validated on an authorized Windows test machine before client rollout. There is no Windows Service installation, automatic rollback, or third-party application patching.
 
-## Hosting with persistent storage
+## Free hosted option
+
+See [RENDER.md](RENDER.md) for the default Render Free + Neon Free Blueprint. Cloud deployments require DATABASE_URL; no ephemeral database fallback is allowed.
+
+## Alternative: self-hosting with persistent storage
 
 Use a Linux host with Docker Compose, a hostname pointing to it, and ports 80/443 available. The included Compose stack serves both the dashboard and API on the same HTTPS origin. Caddy obtains the TLS certificate. SQLite data lives in a durable Docker volume; use a single backend replica. Do not place this SQLite file on an ephemeral Vercel filesystem.
 

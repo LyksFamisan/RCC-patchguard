@@ -1,21 +1,20 @@
-# Review Render's paid service + disk estimate before deployment.
+# Free compute + an external durable Neon Free database. No paid disk.
 services:
   - type: web
     name: rcc-patchguard-api
     runtime: docker
-    plan: starter
+    plan: free
     dockerfilePath: ./backend/Render.Dockerfile
     dockerContext: .
     healthCheckPath: /api/health
-    numInstances: 1
     envVars:
+      - key: DATABASE_URL
+        sync: false
       - key: PATCHGUARD_ADMIN_EMAIL
         sync: false
       - key: PATCHGUARD_ADMIN_PASSWORD
         sync: false
+      - key: PATCHGUARD_REQUIRE_POSTGRES
+        value: "1"
       - key: PATCHGUARD_REMOTE_JOBS
         value: "0"
-    disk:
-      name: patchguard-data
-      mountPath: /data
-      sizeGB: 1
