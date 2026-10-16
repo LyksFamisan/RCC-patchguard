@@ -320,3 +320,58 @@ body { line-height: 1.5; }
   .modal-footer .button { white-space: normal; }
   input, select, textarea { font-size: 16px; }
 }
+
+/* ACMobility-inspired light blue and light green palette. */
+:root {
+  --navy: #123e62;
+  --navy-deep: #09283f;
+  --teal: #087d55;
+  --teal-dark: #05613f;
+  --teal-pale: #edf9ef;
+  --border: #d9e7ed;
+  --muted: #566b7b;
+  --bg: #f3f8fb;
+  --brand-blue: #64c5e7;
+  --brand-green: #a9d76f;
+}
+body { background: linear-gradient(135deg, #eef7fc 0%, #f7fbf7 100%); }
+.sidebar { background: linear-gradient(165deg, #123e62 0%, #09283f 75%); }
+.brand { border-bottom-color: rgba(100,197,231,.25); }
+.brand-mark { background: linear-gradient(135deg, var(--brand-blue), var(--brand-green)); color: #123e42; box-shadow: 0 5px 18px rgba(100,197,231,.18); }
+.brand small { color: #b5d6e8; }
+.nav-item { color: #c2d5e3; }
+.nav-item:hover { background: rgba(100,197,231,.12); color: #fff; }
+.nav-item.active { background: linear-gradient(90deg, rgba(100,197,231,.19), rgba(169,215,111,.12)); color: #fff; box-shadow: inset 3px 0 var(--brand-green); }
+.nav-item.active svg { color: var(--brand-green); }
+.sidebar-status { background: rgba(100,197,231,.07); border-color: rgba(100,197,231,.2); }
+.status-row small, .user-card small { color: #b2cddd; }
+.sidebar-status button { color: #c0e89b; }
+.avatar { background: #235777; color: #e3f5ff; }
+.topbar { border-top: 4px solid transparent; border-image: linear-gradient(90deg, var(--brand-blue), var(--brand-green)) 1; background: rgba(255,255,255,.97); }
+h1 { color: #123e62; }
+.eyebrow { color: #15658a; }
+.panel { border-color: var(--border); box-shadow: 0 3px 14px rgba(18,62,98,.045); }
+.panel-heading { background: linear-gradient(110deg, #f0f8fd, #f5fbf1); border-radius: 10px 10px 0 0; }
+.panel-heading h2 { color: #123e62; }
+.panel-heading p, .page-title p { color: #566b7b; }
+.button-primary { background: #087d55; box-shadow: 0 3px 8px rgba(8,125,85,.16); }
+.button-primary:hover:not(:disabled) { background: #05613f; }
+.button-secondary { border-color: #b6d7e6; color: #155778; background: #f7fcff; }
+.button-secondary:hover:not(:disabled) { background: #eaf6fc; }
+.metric-card { border-top: 3px solid var(--brand-blue); background: linear-gradient(150deg, #fff 65%, #edf8fd); }
+.metric-card:nth-child(even) { border-top-color: var(--brand-green); background: linear-gradient(150deg, #fff 65%, #f2faea); }
+.metric-card-button:hover { border-color: #68bad8; box-shadow: 0 5px 16px rgba(18,62,98,.1); }
+thead { background: #edf6fc; color: #214d69; }
+tbody tr:hover { background: #f2f9fc; }
+.workspace-banner { background: #edf8f0; border-color: #c7e3b4; color: #285e42; }
+.workspace-error { background: #fff1f2; border-color: #f5c8cd; color: #9e3c46; }
+.report-card-icon, .settings-list button.active .settings-icon { background: #eaf6fc; color: #15658a; }
+.settings-nav button.active { background: #edf8f0; color: #05613f; }
+.agent-download-card { background: linear-gradient(120deg, #edf7fd, #f2faea); border-color: #c9e2df; }
+.agent-download-icon { background: #daefdf; color: #05613f; }
+.preview-header { background: linear-gradient(110deg, #123e62, #16516e); border-bottom: 4px solid var(--brand-green); }
+:where(button, a, input, select, textarea):focus-visible { outline: 3px solid #2586ae; outline-offset: 3px; }
+@media print {
+  body { background: white; }
+  .panel, .metric-card { box-shadow: none; }
+}
