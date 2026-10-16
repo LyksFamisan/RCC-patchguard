@@ -1,0 +1,21 @@
+# Review Render's paid service + disk estimate before deployment.
+services:
+  - type: web
+    name: rcc-patchguard-api
+    runtime: docker
+    plan: starter
+    dockerfilePath: ./backend/Render.Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    numInstances: 1
+    envVars:
+      - key: PATCHGUARD_ADMIN_EMAIL
+        sync: false
+      - key: PATCHGUARD_ADMIN_PASSWORD
+        sync: false
+      - key: PATCHGUARD_REMOTE_JOBS
+        value: "0"
+    disk:
+      name: patchguard-data
+      mountPath: /data
+      sizeGB: 1
