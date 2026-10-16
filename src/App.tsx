@@ -653,7 +653,7 @@ function App() {
   const pageMeta: Record<Page, [string, string]> = {
     Overview: [
       "Overview",
-      "January 2027 onboarding scenario · scope and SLA pending client confirmation.",
+      "Patch management overview · scope and SLA pending client confirmation.",
     ],
     Assets: [
       "Asset inventory",
@@ -811,7 +811,7 @@ function App() {
     if (workspace.role !== "Administrator") {
       openAction(
         "Administrator permission required",
-        "Only the Administrator role may change asset scope in this rehearsal. A production service must enforce this permission on the server.",
+        "Select the Administrator demo role to change asset scope.",
       )
       return
     }
@@ -1535,7 +1535,7 @@ function App() {
               <small>
                 {liveDevices.length
                   ? `${liveDevices.length} live agent device${liveDevices.length === 1 ? "" : "s"}`
-                  : "Agent evidence requires backend sign-in"}
+                  : "Sign in to view devices"}
               </small>
             </div>
           </div>
@@ -1555,7 +1555,7 @@ function App() {
           </div>
           <div>
             <strong>{workspace.role}</strong>
-            <small>Rehearsal persona · not authenticated</small>
+            <small>Demo role</small>
           </div>
           <button
             className="user-options-button"
@@ -1563,7 +1563,7 @@ function App() {
             onClick={() =>
               openAction(
                 "Account",
-                  "This sidebar role is a rehearsal persona, not an authenticated account. Use Enroll Device to sign in to the PatchGuard backend; only that server session authorizes token issuance or live record access.",
+                  "Demo roles preview workflows. Sign in under Enroll Device to access connected devices.",
               )
             }
           >
@@ -1590,7 +1590,7 @@ function App() {
           </div>
           <div className="top-actions">
             <Badge tone="amber">
-              January 2027 · rehearsal + live evidence separated
+              Demo workspace
             </Badge>
             <div className="timezone">
               <Icon name="clock" size={15} />
@@ -1609,7 +1609,7 @@ function App() {
               onClick={() =>
                 openAction(
                   "Notifications",
-                  "Sample workspace alerts: 2 approval requests are waiting for review, and 1 deployment failure needs a retry decision. These are rehearsal records, not live alerts.",
+                  "Demo alerts: 2 approvals pending and 1 failed deployment.",
                 )
               }
             >
@@ -1621,7 +1621,7 @@ function App() {
               onClick={() =>
                 openAction(
                   "PatchGuard help",
-                  "Use the navigation to review rehearsal workflows. Actual Windows agent devices and scans are fetched separately from the authenticated backend. Patch installation and reboot remain unavailable.",
+                  "Review assets, scans, approvals, and reports. Sign in to access agent records. Remote installation and restart are unavailable.",
                 )
               }
             >
@@ -1634,10 +1634,7 @@ function App() {
           <div className="workspace-banner" role="status">
             <Icon name="info" size={16} />
             <span>
-              Browser-persisted records are rehearsal only. Actual Windows
-              agent evidence is fetched separately from the authenticated API;
-              patch installation and restart are not supported. The 48-hour
-              target remains proposed, pending AC Mobility confirmation.
+              Demo workspace · Remote installation and restart unavailable. SLA targets pending approval.
             </span>
           </div>
           {storageError && (
@@ -1648,7 +1645,7 @@ function App() {
           )}
           <div className="page-title">
             <div>
-              <div className="eyebrow">Patch management workspace</div>
+              <div className="eyebrow">RCC Patchguard</div>
               <h1>{pageMeta[page][0]}</h1>
               <p>{pageMeta[page][1]}</p>
             </div>
@@ -1912,21 +1909,19 @@ function Overview({
         <Icon name="info" size={18} />
         <div>
           <strong>
-            January 2027 onboarding scenario · not a confirmed client schedule.
+            Patch management overview
           </strong>
           <span>
-            The supplied device list is a starting reference, not the complete
-            1,300+ environment. Records below are demonstration data, not live
-            Windows connectivity.
+            Demo inventory and patch readiness. Review connected devices under Assets.
           </span>
         </div>
         <Button variant="ghost" onClick={() => goTo("Reports")}>
-          View sample report
+          View report
         </Button>
       </div>
       <div className="metric-grid">
         <MetricCard
-          label="Starting reference assets"
+          label="Inventory assets"
           value={String(assets.length)}
           note={`${scopedAssets.length} approved in-scope · ${assets.filter((asset) => asset.source === "Demonstration").length} demo records`}
           icon="devices"
@@ -1935,7 +1930,7 @@ function Overview({
         <MetricCard
           label="Scan coverage"
           value="Not confirmed"
-          note="Records do not include the total number of scanned devices"
+          note="Awaiting complete scan inventory"
           icon="scan"
           tone="blue"
           onClick={() => goTo("Scan results")}
@@ -1943,7 +1938,7 @@ function Overview({
         <MetricCard
           label="Distinct patch checks"
           value={String(metrics.distinctPatchChecks)}
-          note="Unique applicable update IDs · source-tagged"
+          note="Unique applicable updates"
           icon="check"
           tone="amber"
           onClick={() => goTo("Scan results")}
@@ -1959,18 +1954,18 @@ function Overview({
         <MetricCard
           label="Critical target"
           value={`${criticalTargetHours} hours`}
-          note="Proposed · pending client confirmation"
+          note="Pending client approval"
           icon="refresh"
           tone="violet"
           onClick={() => goTo("SLA monitoring")}
         />
         <MetricCard
-          label="Unconfirmed reboot status"
+          label="Reboot status unknown"
           value={String(
             assets.filter((asset) => asset.rebootStatus === "Not confirmed")
               .length,
           )}
-          note="No live reboot evidence is connected"
+          note="Awaiting device status"
           icon="shield"
           tone="green"
           onClick={() => goTo("Assets")}
@@ -1980,10 +1975,10 @@ function Overview({
         <Panel>
           <PanelHeading
             title="Patch operations workflow"
-            description="Current activity across the controlled update lifecycle."
+            description="Track assessment, approval, and verification."
             action={
               <Badge tone="amber">
-                January 2027 · proposed onboarding sequence
+                Patch lifecycle
               </Badge>
             }
           />
@@ -2009,8 +2004,8 @@ function Overview({
                   {index === 0
                     ? "Unconfirmed"
                     : index === 5 && workspace.deployments.some((job) => job.status === "Verified")
-                      ? "Rehearsal verified"
-                      : "Rehearsal / pending"}
+                      ? "Demo verified"
+                      : "Demo / pending"}
                 </Badge>
               </div>
             ))}
@@ -2027,10 +2022,9 @@ function Overview({
                 <Icon name="plug" size={23} />
               </div>
               <div>
-                <strong>Sample connector records</strong>
+                <strong>Agent connection</strong>
                 <p>
-                  These values are demonstration-only. Actual Windows agent
-                  evidence is shown separately in Assets and Scan results.
+                  Sample connection status. View agent records in Assets and Scan results.
                 </p>
               </div>
             </div>
@@ -2405,7 +2399,7 @@ function Assets({
       <Panel>
         <PanelHeading
           title="Import history"
-          description="CSV inventory imports are persisted in this browser; each row remains an unconfirmed discovered record."
+          description="Imported inventory · scope approval required."
         />
         {importHistory.length ? (
           <Table
@@ -2464,7 +2458,7 @@ function LiveAgentDevicesPanel({
     <Panel>
   <PanelHeading
   title="Live Windows agent devices"
-  description="Actual backend records only · heartbeat time is the API receipt time."
+  description="Connected devices and latest heartbeat."
   action={
   <div className="button-row">
   <Button variant="secondary" icon="refresh" onClick={onRefresh}>
@@ -2765,7 +2759,7 @@ function LiveAgentScansPanel({
     <Panel>
       <PanelHeading
         title="Live Windows agent scan submissions"
-        description="Read-only Windows configured update source results · not a full vulnerability scan."
+        description="Windows update scan results."
         action={
           <div className="button-row">
             <Button variant="secondary" icon="refresh" onClick={onRefresh}>
@@ -3354,7 +3348,7 @@ function Approvals({
       <Panel>
         <PanelHeading
           title="Approval decision audit"
-          description="Approver, decision, timestamp, comments, and source are persisted in this browser rehearsal."
+          description="Demo approval history and comments."
         />
         {workspace.approvals.length ? (
           <Table
@@ -3606,8 +3600,7 @@ function Deployments({
         )}
       </Panel>
       <IntegrationNote>
-        Rehearsal states are not live provider results. No endpoint agent,
-        automated reboot, retry, or real API integration is implemented.
+        Demo deployment records. Remote installation, retry, and restart are unavailable.
       </IntegrationNote>
     </div>
   )
@@ -3657,7 +3650,7 @@ function Verification({
       <Panel>
         <PanelHeading
           title="Verification queue"
-          description="Demo rescan records are labelled and do not confirm actual client remediation."
+          description="Demo rescan results · live verification pending."
         />
         <Table
           headers={[
@@ -4042,7 +4035,7 @@ function Reports({
       <Panel>
         <PanelHeading
           title="Generated reports"
-          description="Exports use current browser-persisted records."
+          description="Export current workspace records."
           action={
             <Button icon="report" onClick={openPreview}>
               Preview report
@@ -4064,7 +4057,7 @@ function Reports({
             <td>
               <strong>Current workspace report</strong>
             </td>
-            <td>January 2027 onboarding scenario</td>
+            <td>Patch management overview</td>
             <td>{workspace.assets.length} starting-reference assets</td>
             <td>Current rehearsal role</td>
             <td>{formatTimestamp(new Date().toISOString())}</td>
@@ -4437,7 +4430,7 @@ function Settings({
     if (workspace.role !== "Administrator") {
       onAction(
         "Administrator permission required",
-        "Configuration edits require the Administrator role in this rehearsal. A production API must enforce authorization independently of this browser.",
+        "Select the Administrator demo role to edit settings.",
       )
       return
     }
@@ -4853,12 +4846,11 @@ function Settings({
               <div className="subtle-banner">
                 <Icon name="warning" size={16} />
                 <span>
-                  Rehearsal persona only; this is not authentication or access
-                  control. Production role enforcement must be server-side.
+                  Demo role selection. Sign in separately for device access.
                 </span>
               </div>
               <label>
-                Rehearsal role
+                Demo role
                 <select
                   value={workspace.role}
                   onChange={(event) =>
@@ -4900,15 +4892,13 @@ function Settings({
                 </div>
                 <div>
                   <small>Workspace mode</small>
-                  <strong>Browser-persisted demonstration</strong>
+                  <strong>Demo workspace</strong>
                 </div>
               </div>
               <div className="subtle-banner">
                 <Icon name="info" size={16} />
                 <span>
-                  This section is a rehearsal view; no backend exists. Unknown
-                  scope stays unapproved and all imported records are discovered
-                  by default.
+                  Demo configuration. Imported devices require scope approval.
                 </span>
               </div>
               {selectedTitle === "Enrollment & approved scope" ? (
@@ -5089,7 +5079,7 @@ function EnrollmentPage({
       <Panel>
         <PanelHeading
           title="Authenticated device enrollment"
-          description="Backend-issued, hostname-scoped, single-use tokens expire after 10 minutes."
+          description="Generate a single-use device token. Valid for 10 minutes."
         />
         <div className="settings-fields">
           {sessionStatus === "loading" ? (
@@ -5244,7 +5234,7 @@ function EnrollmentPage({
       <Panel>
         <PanelHeading
           title="Windows agent package"
-          description="Download the reviewed PowerShell agent files for an authorized Windows 10/11 test laptop."
+          description="Download the Windows 10/11 agent for enrollment and scanning."
         />
         <div className="agent-download-card">
           <div className="agent-download-copy">
@@ -5286,8 +5276,8 @@ function EnrollmentPage({
       </Panel>
       <Panel>
         <PanelHeading
-          title="Laptop 1 and Laptop 2 connection steps"
-          description="No installation or reboot operation is available in this connector."
+          title="Connect a Windows device"
+          description="Enrollment and scanning only."
         />
         <ol className="agent-steps">
           <li>
@@ -5596,7 +5586,7 @@ function ReportModal({
   )
   return (
     <Modal
-      title="January 2027 onboarding report preview"
+      title="Patch management report"
       onClose={onClose}
       wide
     >
@@ -5746,7 +5736,7 @@ function exportWorkspaceReport(workspace: WorkspaceState) {
     (item) => item.due && item.due.getTime() < Date.now(),
   )
   const rows: string[][] = [
-    ["report", "January 2027 onboarding scenario"],
+    ["report", "Patch management overview"],
     ["reporting_period", "January 2027"],
     [
       "data_mode",
