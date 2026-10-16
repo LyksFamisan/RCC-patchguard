@@ -1,3 +1,4 @@
+import RemoteOperations from "./RemoteOperations"
 import {
   useEffect,
   useMemo,
@@ -1621,7 +1622,7 @@ function App() {
               onClick={() =>
                 openAction(
                   "PatchGuard help",
-                  "Review assets, scans, approvals, and reports. Sign in to access agent records. Remote installation and restart are unavailable.",
+                  "Review assets, scans, approvals, and reports. Sign in to manage live device jobs under Assets → Remote operations.",
                 )
               }
             >
@@ -1634,7 +1635,7 @@ function App() {
           <div className="workspace-banner" role="status">
             <Icon name="info" size={16} />
             <span>
-              Demo workspace · Remote installation and restart unavailable. SLA targets pending approval.
+              Demo workflows · Manage approved device jobs under Assets → Remote operations. SLA targets pending approval.
             </span>
           </div>
           {storageError && (
@@ -1699,6 +1700,7 @@ function App() {
               onRevoke={handleAgentRevoke}
             />
           )}
+          {page === "Assets" && <RemoteOperations user={agentUser} devices={liveDevices} scans={liveScans} />}
           {page === "Scan results" && (
             <ScanResults
               scans={workspace.scans}
@@ -2473,7 +2475,7 @@ function LiveAgentDevicesPanel({
   <div className="subtle-banner">
   <Icon name="plug" size={16} />
   <span>
-  Monitor another Windows computer remotely by installing the PatchGuard agent there. Use the enrollment flow to create a one-time token for each computer; this dashboard does not execute commands or restart devices.
+  Enroll each Windows computer with its own token. Use Remote operations below for installation and restart requests; a separately approved job and elevated worker are required.
   </span>
   </div>
   {loading ? (

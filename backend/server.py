@@ -4,6 +4,7 @@ from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from http.cookies import SimpleCookie
 from urllib.parse import urlsplit
 from pathlib import Path
+import remote_jobs
 
 DB = Path(os.environ.get('PATCHGUARD_DB', str(Path(__file__).with_name('patchguard.sqlite3'))))
 HOST = os.environ.get('PATCHGUARD_HOST', '127.0.0.1')
@@ -29,6 +30,7 @@ def init():
   CREATE TABLE IF NOT EXISTS scans(id TEXT PRIMARY KEY,asset_id TEXT NOT NULL,hostname TEXT,provider TEXT,started_at TEXT,completed_at TEXT,received_at TEXT,status TEXT,updates TEXT NOT NULL,FOREIGN KEY(asset_id) REFERENCES devices(id));
   CREATE TABLE IF NOT EXISTS audit(id TEXT PRIMARY KEY,event TEXT NOT NULL,subject TEXT,at TEXT NOT NULL);
   ''')
+  c.executescript(remote_jobs.SCHEMA)
   if ADMIN_EMAIL and ADMIN_PASSWORD:
    if len(ADMIN_PASSWORD)<14: raise RuntimeError('PATCHGUARD_ADMIN_PASSWORD must be at least 14 characters')
    if not c.execute('SELECT 1 FROM users WHERE email=?',(ADMIN_EMAIL.lower(),)).fetchone():
@@ -68,10 +70,13 @@ class Handler(BaseHTTPRequestHandler):
     if origin:
      from urllib.parse import urlsplit as parse
      u=parse(origin); host=self.headers.get('Host','')
-     if u.netloc!=host: return self.reply(403,{'error':'Origin mismatch'})
+     allowed=os.environ.get('PATCHGUARD_PUBLIC_ORIGIN', '')
+     if (allowed and origin != allowed) or (not allowed and u.netloc != host): return self.reply(403,{'error':'Origin mismatch'})
    data=self.body() if self.command=='POST' else {}
    with LOCK,conn() as c:
+    c.execute('BEGIN IMMEDIATE')
     user=self.user(c)
+    if remote_jobs.route(self,c,user,path,data,now,digest,audit):return
     if path=='/api/health' and self.command=='GET':return self.reply(200,{'ok':True})
     if path=='/api/auth/login' and self.command=='POST':
      email=str(data.get('email','')).lower(); password=str(data.get('password',''))
@@ -141,7 +146,18 @@ class Handler(BaseHTTPRequestHandler):
   except Exception as ex:
    print('Backend error:',type(ex).__name__,flush=True)
    return self.reply(500,{'error':'Internal server error'})
- def do_GET(self):self.execute()
+ def do_GET(self):
+  if self.path.startswith('/api/'):
+   return self.execute()
+  import mimetypes
+  from urllib.parse import unquote
+  root=Path(os.environ.get('PATCHGUARD_SITE', '/app/site')).resolve()
+  target=(root / unquote(urlsplit(self.path).path).lstrip('/')).resolve()
+  if not target.is_relative_to(root):return self.reply(404,{'error':'Not found'})
+  if not target.is_file():target=root / 'index.html'
+  if not target.is_file():return self.reply(404,{'error':'Not found'})
+  payload=target.read_bytes()
+  self.send_response(200);self.send_header('Content-Type',mimetypes.guess_type(target)[0] or 'application/octet-stream');self.send_header('Content-Length',str(len(payload)));self.send_header('Cache-Control','no-cache');self.end_headers();self.wfile.write(payload)
  def do_POST(self):self.execute()
 if __name__=='__main__':
  init(); print(f'PatchGuard backend listening on http://{HOST}:{PORT}',flush=True)

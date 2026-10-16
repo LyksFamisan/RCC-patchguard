@@ -24,3 +24,7 @@ logs/
 backend/*.sqlite3*
 .env
 .env.*
+
+__pycache__/
+*.pyc
+backend/.venv/

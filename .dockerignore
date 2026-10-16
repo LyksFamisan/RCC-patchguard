@@ -1,0 +1,8 @@
+.git
+node_modules
+dist
+backend/.venv
+backend/*.sqlite3*
+.env*
+upload
+agent-service-reference

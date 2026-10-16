@@ -30,10 +30,24 @@ Success: `{ "accepted": true }`
 
 Validate payload sizes and schema; bind identity to authenticated device, preserve source timestamps, separate from sample and historical records. Escape imported text when rendering. Record an audit event and return errors as JSON. Do not infer compliance across products not assessed by the Windows Update source.
 
-No installation/job/restart endpoints are supported by this release. Do not send executable commands to it.
+The original GUI agent does not process jobs. The optional `Remote-Worker.ps1` uses the remote-job endpoints below; it never accepts executable command strings.
 
 ## GET /api/agent/devices and GET /api/agent/scans (authenticated dashboard session)
 Return only server-persisted live agent device and scan records. These endpoints do not include imported or demonstration records. Heartbeat freshness is based on the server receipt time; scans preserve both the agent scan timestamp and server receipt timestamp.
 
 ## POST /api/agent/devices/{deviceId}/revoke (authenticated dashboard session)
 Only an authenticated Engineer may revoke a device credential. Revocation immediately prevents further heartbeat and scan submissions. The plaintext credential is never returned by read APIs.
+
+## Remote operations v0.3 (explicit server opt-in)
+
+All routes return 503 while `PATCHGUARD_REMOTE_JOBS` is not `1`.
+
+- `GET /api/remote/jobs`: authenticated session; list jobs with status and device-reported results. Claim secrets are never returned.
+- `POST /api/remote/jobs`: engineer session; `{deviceId, confirmHostname, kind: "install"|"restart", updates:[{id,revision}], reason, startsAt, endsAt}`. Install selections must match the latest uploaded scan (24-hour maximum age). Returns a pending job.
+- `POST /api/remote/jobs/{id}/approve`: separate client_approver session with `{confirmHostname}`. Approval binds the immutable device, update list, reason, and UTC maintenance window.
+- `POST /api/remote/jobs/{id}/cancel`: engineer or approver; pending/approved jobs only.
+- `POST /api/remote/poll`: device Bearer credential and `{deviceId}`; returns `{job:null}` or one job with immutable parameters and a one-time claim token. Jobs are delivered once and are never automatically requeued.
+- `POST /api/remote/authorize`: device Bearer credential and `{deviceId,jobId,claimToken}`; rechecks revocation, job state and window immediately before action.
+- `POST /api/remote/result`: same device credential/claim plus `{status,detail}`. States: running → succeeded/failed for installation; running → restart_pending → restart_confirmed/failed for restart. Repeated final acknowledgments are idempotent.
+
+A restart acknowledgment is not proof of a completed reboot. `restart_confirmed` requires worker observation of a changed Windows boot timestamp. Installer success requires a fresh scan for remediation verification. See `backend/DEPLOYMENT.md` for deployment and operational limits.

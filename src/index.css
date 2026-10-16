@@ -473,3 +473,14 @@ td { padding: 16px 18px; font-size: 13px; color: #476370; }
  .panel, .metric-card { box-shadow: none; break-inside: avoid; }
  .metric-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
+
+.remote-operations { margin-top: 24px; }
+.remote-body { padding: 20px; }
+.remote-request { padding-bottom: 24px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+.remote-request > .button { margin: 18px 0 0; }
+.remote-updates { border: 1px solid var(--border); border-radius: 10px; padding: 16px; max-height: 320px; overflow: auto; }
+.remote-updates label { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; font-size: 14px; }
+.remote-updates input { margin-top: 5px; }
+.remote-operations td { white-space: normal; min-width: 190px; vertical-align: top; }
+.remote-operations pre { max-width: 450px; max-height: 240px; overflow: auto; font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.remote-operations td input { max-width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 8px; }

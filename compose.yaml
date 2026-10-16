@@ -1,0 +1,33 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    restart: unless-stopped
+    environment:
+      PATCHGUARD_ADMIN_EMAIL: ${PATCHGUARD_ADMIN_EMAIL:?Set admin email}
+      PATCHGUARD_ADMIN_PASSWORD: ${PATCHGUARD_ADMIN_PASSWORD:?Set a strong password}
+      PATCHGUARD_PUBLIC_ORIGIN: https://${PATCHGUARD_DOMAIN:?Set hostname}
+      PATCHGUARD_REMOTE_JOBS: ${PATCHGUARD_REMOTE_JOBS:-0}
+    volumes:
+      - patchguard_data:/data
+    expose:
+      - "8787"
+  proxy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      PATCHGUARD_DOMAIN: ${PATCHGUARD_DOMAIN:?Set hostname}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./backend/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+volumes:
+  patchguard_data:
+  caddy_data:
+  caddy_config:

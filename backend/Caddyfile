@@ -1,0 +1,9 @@
+{$PATCHGUARD_DOMAIN} {
+    encode zstd gzip
+    header {
+        X-Content-Type-Options nosniff
+        Referrer-Policy same-origin
+        X-Frame-Options DENY
+    }
+    reverse_proxy backend:8787
+}

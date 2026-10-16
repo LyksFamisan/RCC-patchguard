@@ -1,3 +1,7 @@
+# Optional remote worker
+
+`Remote-Worker.ps1` supports approved Windows update installation and separate restart requests. It runs elevated under the same enrolled Windows user. See `../backend/DEPLOYMENT.md` for setup, approvals, pilot testing, and limits. The original GUI agent described below remains read-only.
+
 # RCC PatchGuard Windows Agent 0.2
 
 A real Windows desktop application implemented in Windows PowerShell 5.1 and WinForms. This is source software, not an image, compiled EXE, Windows service, or production-certified agent. No external packages required. Intended first for an authorized RCC Windows 10/11 test laptop with Windows PowerShell 5.1. Windows runtime validation is outstanding: this package was authored in Linux, which cannot execute WinForms or Windows Update COM.
