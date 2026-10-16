@@ -71,8 +71,8 @@ class Handler(BaseHTTPRequestHandler):
     if origin:
      from urllib.parse import urlsplit as parse
      u=parse(origin); host=self.headers.get('Host','')
-     allowed=os.environ.get('PATCHGUARD_PUBLIC_ORIGIN', '')
-     if (allowed and origin != allowed) or (not allowed and u.netloc != host): return self.reply(403,{'error':'Origin mismatch'})
+     allowed=[value.strip() for value in os.environ.get('PATCHGUARD_PUBLIC_ORIGIN', '').split(',') if value.strip()]
+     if (allowed and origin not in allowed) or (not allowed and u.netloc != host): return self.reply(403,{'error':'Origin mismatch'})
    data=self.body() if self.command=='POST' else {}
    with LOCK,conn() as c:
     c.execute('BEGIN IMMEDIATE')
