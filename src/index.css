@@ -521,3 +521,39 @@ input[type=checkbox], input[type=radio] { accent-color: #1685bd; }
 .sow-field textarea { min-height: 76px; resize: vertical; }.sow-footnote { font-size: 12px; color: #547890; margin: 15px 0 0; }
 @media(max-width:1000px) { .sow-layout { grid-template-columns: 1fr; }.sow-stages { display: grid; grid-template-columns: 1fr 1fr; } }
 @media(max-width:580px) { .sow-stages { grid-template-columns: 1fr; }.sow-detail { padding: 16px; }.sow-field textarea, .sow-field input { font-size: 16px; } }
+
+/* AC Mobility dark blue brand theme */
+:root { --teal: #174b85; --teal-dark: #10355f; --teal-pale: #edf3fb; --navy: #173b67; --navy-deep: #0b2240; --border: #dce5ef; --muted: #60738a; --bg: #f3f6fb; }
+body { background: var(--bg); color: #243b55; }
+.sidebar { background: linear-gradient(180deg, #102d50, #091c35); border-right: 1px solid #203e60; color: #d9e6f4; }
+.brand strong, .status-row strong, .user-card strong { color: #f4f8ff; }
+.brand small, .status-row small, .user-card small { color: #b2c8df; }
+.brand-mark { background: #eaf2fc; color: #173f70; }
+.brand-mark::after { border-color: #b7cce5; }
+.nav-item { color: #c1d2e7; }
+.nav-item:hover { background: #1b3e67; color: #fff; }
+.nav-item.active { background: #254d7c; color: #fff; box-shadow: inset 4px 0 #9ec9ff; }
+.nav-item.active svg { color: #c7e0ff; }
+.nav-item i { color: #e9f3ff; background: #315b88; }
+.sidebar-status { background: #153454; border-color: #33516f; }
+.sidebar-status button, .user-options-button { color: #c1dcff; }
+.avatar { background: #31547c; color: #eef6ff; }
+.topbar { border-top-color: #173f70; }
+h1, .panel-heading h2, .metric-value { color: #15385e; }
+.eyebrow { color: #234f80; }
+.button-primary { background: #174b85; color: #fff; }
+.button-primary:hover:not(:disabled) { background: #10355f; }
+.button-secondary { color: #234f80; border-color: #bdcee2; }
+.button-secondary:hover:not(:disabled) { background: #edf3fb; }
+.workspace-banner, .workspace-banner:not(.workspace-error), .sow-context { background: #edf3fb; border-color: #cbdcee; color: #254d75; }
+.workspace-banner.workspace-error { background: #fff1f2; color: #9e3c46; }
+.notice-bar:not(.caution) { background: #edf3fb; border-color: #cfdfef; color: #254d75; }
+.notice-bar:not(.caution) span { color: #58728f; }
+.metric-icon, .empty-icon, .report-card-icon { background: #edf3fb; color: #234f80; }
+.workflow-line span { background: #edf3fb; border-color: #c6d7eb; color: #234f80; }
+.sow-stage.selected { background: #dce8f8; color: #143d6a; }
+.sow-stage:hover { background: #edf3fb; }
+.sow-number { color: #234f80; }
+.preview-header { background: #102d50; border-bottom-color: #37679d; }
+input[type=checkbox], input[type=radio] { accent-color: #174b85; }
+:where(button, a, input, select, textarea):focus-visible { outline-color: #376ea9; }
