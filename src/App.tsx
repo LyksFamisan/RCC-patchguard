@@ -437,7 +437,7 @@ function Modal({
       >
         <div className="modal-header">
           <div>
-            <span className="eyebrow">AC Mobility · RCC PatchGuard</span>
+            <span className="eyebrow">AC Mobility · Dashboard</span>
             <h2>{title}</h2>
           </div>
           <button className="icon-button" onClick={onClose} aria-label="Close">
@@ -1501,10 +1501,10 @@ function App() {
       <aside className={`sidebar ${menuOpen ? "sidebar-open" : ""}`}>
         <div className="brand">
           <div className="brand-mark">
-            <span>R</span>
+            <span>D</span>
           </div>
           <div>
-            <strong>RCC PatchGuard</strong>
+            <strong>Dashboard</strong>
             <small>AC Mobility</small>
           </div>
         </div>
@@ -1631,7 +1631,7 @@ function App() {
           )}
           <div className="page-title">
             <div>
-              <div className="eyebrow">RCC Patchguard</div>
+              <div className="eyebrow">Dashboard</div>
               <h1>{pageMeta[page][0]}</h1>
               <p>{pageMeta[page][1]}</p>
             </div>
@@ -5480,7 +5480,7 @@ function ReportModal({
       <div className="report-preview">
         <div className="preview-header">
           <div className="brand-mark small">
-            <span>R</span>
+            <span>D</span>
           </div>
           <div>
             <strong>AC Mobility · Patch Operations</strong>
