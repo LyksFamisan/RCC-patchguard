@@ -53,15 +53,12 @@ type Page = "SOW workflow" | "Overview" | "Assets" | "Scan results" | "Enroll De
 type IconName = "grid" | "devices" | "scan" | "flask" | "check" | "rocket" | "shield" | "clock" | "report" | "history" | "settings" | "plus" | "search" | "bell" | "chevron" | "arrow" | "plug" | "calendar" | "download" | "upload" | "lock" | "info" | "warning" | "close" | "more" | "refresh"
 
 const nav: { label: Page; icon: IconName; divider?: boolean }[] = [
-  { label: "Overview", icon: "grid" },
-  { label: "SOW workflow", icon: "report" },
   { label: "Assets", icon: "devices" },
   { label: "Scan results", icon: "scan" },
   { label: "Testing", icon: "flask", divider: true },
   { label: "Approvals", icon: "check" },
   { label: "Deployments", icon: "rocket" },
   { label: "Verification", icon: "shield" },
-  { label: "SLA monitoring", icon: "clock", divider: true },
   { label: "Reports", icon: "report" },
   { label: "Exceptions & audit", icon: "history" },
 ]
@@ -479,7 +476,7 @@ function ActionDialog({
 }
 
 function App() {
-  const [page, setPage] = useState<Page>("Overview")
+  const [page, setPage] = useState<Page>("Assets")
   const [menuOpen, setMenuOpen] = useState(false)
   const [actionDialog, setActionDialog] = useState<{
     title: string
@@ -1522,8 +1519,7 @@ function App() {
                 }}
               >
                 <Icon name={item.icon} size={18} />
-                <span>{item.label}</span>
-                {item.label === "Approvals" && <i>2</i>}
+                <span>{({Assets: "Asset discovery & scanning", "Scan results": "Risk assessment & prioritization", Testing: "Patch acquisition & testing", Approvals: "Results review with DOIT", Deployments: "Patch deployment", Verification: "Verification & closure", Reports: "Reporting & improvement", "Exceptions & audit": "Exemption management"} as Partial<Record<Page, string>>)[item.label] || item.label}</span>
               </button>
             </div>
           ))}
@@ -1542,18 +1538,7 @@ function App() {
             <strong>{workspace.role}</strong>
             <small>Demo role</small>
           </div>
-          <button
-            className="user-options-button"
-            aria-label="Account options"
-            onClick={() =>
-              openAction(
-                "Account",
-                  "Demo roles represent RCC execution, DOIT approval and management review within the SOW.",
-              )
-            }
-          >
-            <Icon name="more" size={18} />
-          </button>
+
         </div>
       </aside>
 
@@ -1575,9 +1560,7 @@ function App() {
           </div>
           <div className="top-actions">
             <Badge tone="amber">Demo workspace</Badge>
-            <select aria-label="SOW demo role" value={workspace.role} onChange={(event) => setWorkspace(current => ({...current, role: event.target.value as UserRole}))}>
-              {(["RCC Engineer", "AC Mobility Approver", "Administrator", "Read-only Management"] as UserRole[]).map(role => <option key={role}>{role}</option>)}
-            </select>
+
             <div className="timezone">
               <Icon name="clock" size={15} />
               <span>
@@ -1589,30 +1572,6 @@ function App() {
                 }).format(new Date())}
               </span>
             </div>
-            <button
-              className="icon-button"
-              aria-label="Notifications"
-              onClick={() =>
-                openAction(
-                  "Notifications",
-                  "Demo alerts: 2 approvals pending and 1 failed deployment.",
-                )
-              }
-            >
-              <Icon name="bell" size={18} />
-            </button>
-            <button
-              className="help-button"
-              aria-label="Help"
-              onClick={() =>
-                openAction(
-                  "PatchGuard help",
-                  "Review assets, scans, approvals, and reports. Sign in to manage live device jobs under Assets → Remote operations.",
-                )
-              }
-            >
-              ?
-            </button>
           </div>
         </header>
 
@@ -1654,7 +1613,11 @@ function App() {
             </div>
           </div>
 
-          {page === "SOW workflow" && <SowWorkflow workspace={workspace} onNavigate={(target) => setPage(target as Page)} />}
+          {(() => {
+            const criteriaPages: Page[] = ["Assets", "Scan results", "Testing", "Approvals", "Deployments", "Verification", "Exceptions & audit", "Reports"];
+            const stageIndex = criteriaPages.indexOf(page);
+            return stageIndex >= 0 ? <details className="panel" style={{padding: "16px", marginBottom: "20px"}}><summary style={{cursor: "pointer", fontWeight: 600}}>SOW requirements & evidence</summary><SowWorkflow key={page} workspace={workspace} stageIndex={stageIndex} onNavigate={(target) => setPage(target as Page)} /></details> : null;
+          })()}
           {page === "Overview" && (
             <Overview
               assets={assets}
