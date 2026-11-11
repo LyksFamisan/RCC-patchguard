@@ -1,5 +1,4 @@
 import SowWorkflow from "./SowWorkflow"
-import RemoteOperations from "./RemoteOperations"
 import {
   useEffect,
   useMemo,
@@ -58,7 +57,6 @@ const nav: { label: Page; icon: IconName; divider?: boolean }[] = [
   { label: "SOW workflow", icon: "report" },
   { label: "Assets", icon: "devices" },
   { label: "Scan results", icon: "scan" },
-  { label: "Enroll Device", icon: "lock" },
   { label: "Testing", icon: "flask", divider: true },
   { label: "Approvals", icon: "check" },
   { label: "Deployments", icon: "rocket" },
@@ -66,7 +64,6 @@ const nav: { label: Page; icon: IconName; divider?: boolean }[] = [
   { label: "SLA monitoring", icon: "clock", divider: true },
   { label: "Reports", icon: "report" },
   { label: "Exceptions & audit", icon: "history" },
-  { label: "Settings", icon: "settings", divider: true },
 ]
 
 function Icon({ name, size = 18 }: { name: IconName; size?: number }) {
@@ -1531,22 +1528,6 @@ function App() {
             </div>
           ))}
         </nav>
-        <div className="sidebar-status">
-          <div className="status-row">
-            <span className="status-dot offline" />
-            <div>
-              <strong>Device Integration</strong>
-              <small>
-                {liveDevices.length
-                  ? `${liveDevices.length} live agent device${liveDevices.length === 1 ? "" : "s"}`
-                  : "Sign in to view devices"}
-              </small>
-            </div>
-          </div>
-          <button onClick={() => setPage("Settings")}>
-            Open settings <Icon name="arrow" size={14} />
-          </button>
-        </div>
         <div className="user-card">
           <div className="avatar">
             {workspace.role === "AC Mobility Approver"
@@ -1567,7 +1548,7 @@ function App() {
             onClick={() =>
               openAction(
                 "Account",
-                  "Demo roles preview workflows. Sign in under Enroll Device to access connected devices.",
+                  "Demo roles represent RCC execution, DOIT approval and management review within the SOW.",
               )
             }
           >
@@ -1593,9 +1574,10 @@ function App() {
             <strong>{page}</strong>
           </div>
           <div className="top-actions">
-            <Badge tone="amber">
-              Demo workspace
-            </Badge>
+            <Badge tone="amber">Demo workspace</Badge>
+            <select aria-label="SOW demo role" value={workspace.role} onChange={(event) => setWorkspace(current => ({...current, role: event.target.value as UserRole}))}>
+              {(["RCC Engineer", "AC Mobility Approver", "Administrator", "Read-only Management"] as UserRole[]).map(role => <option key={role}>{role}</option>)}
+            </select>
             <div className="timezone">
               <Icon name="clock" size={15} />
               <span>
@@ -1638,7 +1620,7 @@ function App() {
           <div className="workspace-banner" role="status">
             <Icon name="info" size={16} />
             <span>
-              AC Mobility SOW · RCC service execution / DOIT approval and risk acceptance. Prototype evidence is separate from connected device jobs.
+              AC Mobility SOW · RCC service execution / DOIT approval and risk acceptance. Evidence records support the eight service criteria.
             </span>
           </div>
           {storageError && (
@@ -1668,11 +1650,7 @@ function App() {
                   Preview report
                 </Button>
               )}
-              {page === "Overview" && (
-                <Button icon="plus" onClick={() => setPage("Enroll Device")}>
-                  Enroll first device
-                </Button>
-              )}
+
             </div>
           </div>
 
@@ -1704,7 +1682,6 @@ function App() {
               onRevoke={handleAgentRevoke}
             />
           )}
-          {page === "Assets" && <RemoteOperations user={agentUser} devices={liveDevices} scans={liveScans} />}
           {page === "Scan results" && (
             <ScanResults
               scans={workspace.scans}
@@ -2017,100 +1994,33 @@ function Overview({
             ))}
           </div>
         </Panel>
-        <div className="stack">
-          <Panel>
-            <PanelHeading
-              title="Device integration"
-              description="Connector health and record freshness."
-            />
-            <div className="connection-card">
-              <div className="connection-icon">
-                <Icon name="plug" size={23} />
-              </div>
-              <div>
-                <strong>Agent connection</strong>
-                <p>
-                  Sample connection status. View agent records in Assets and Scan results.
-                </p>
-              </div>
-            </div>
-            <div className="key-values">
-              <div>
-                <span>Last heartbeat</span>
-                <strong>Sample · 4 min ago</strong>
-              </div>
-              <div>
-                <span>Last successful scan</span>
-                <strong>Sample · 38 min ago</strong>
-              </div>
-              <div>
-                <span>Stale device threshold</span>
-                <strong>24 hours</strong>
-              </div>
-            </div>
-            <Button variant="secondary" onClick={() => goTo("Settings")}>
-              Configure integration
-            </Button>
-          </Panel>
-          <Panel className="window-panel">
-            <div className="window-icon">
-              <Icon name="calendar" size={20} />
-            </div>
-            <div>
-              <span>Next maintenance window</span>
-              <strong>Saturday · 10:00 PM–2:00 AM</strong>
-              <small>
-                Standard deployment requires an approved off-peak window.
-              </small>
-            </div>
-            <button onClick={() => goTo("Settings")}>
-              <Icon name="chevron" size={17} />
-            </button>
-          </Panel>
-        </div>
+        <Panel>
+          <PanelHeading title="Service governance" description="Client decision rights and required service evidence" />
+          <ul className="check-list">
+            <li>RCC: discovery, prioritization, patch testing and approved execution.</li>
+            <li>DOIT: production go / no-go, risk acceptance and closure acceptance.</li>
+            <li>Testing: representative OS / application versions and recovery readiness.</li>
+            <li>Reporting: weekly operations, monthly SLA and quarterly governance.</li>
+          </ul>
+          <div style={{padding: "0 20px 20px"}}><Button variant="secondary" onClick={() => goTo("SOW workflow")}>Review SOW evidence</Button></div>
+        </Panel>
       </div>
       <Panel>
         <PanelHeading
           title="Operational coverage"
-          description="Unscanned and stale devices are excluded from compliance."
+          description="Reconcile inventory, assessment coverage and unresolved scan gaps."
           action={
             <Button variant="ghost" onClick={() => goTo("Assets")}>
               View assets <Icon name="arrow" size={14} />
             </Button>
           }
         />
-        <div className="coverage-empty">
-          <div className="donut">
-            <span>24</span>
-            <small>enrolled</small>
-          </div>
-          <div className="coverage-legend">
-            <div>
-              <i className="teal" />
-              <span>Scanned and current</span>
-              <strong>21</strong>
-            </div>
-            <div>
-              <i className="gray" />
-              <span>Unscanned</span>
-              <strong>1</strong>
-            </div>
-            <div>
-              <i className="orange" />
-              <span>Stale or offline</span>
-              <strong>2</strong>
-            </div>
-          </div>
-          <div className="coverage-copy">
-            <strong>87.5% sample scan coverage</strong>
-            <p>
-              Two stale devices and one unscanned device are excluded from
-              compliance calculations.
-            </p>
-            <Button variant="secondary" onClick={() => goTo("Assets")}>
-              Review coverage
-            </Button>
-          </div>
+        <div className="key-values">
+          <div><span>Inventory records</span><strong>{assets.length}</strong></div>
+          <div><span>Approved in-scope</span><strong>{scopedAssets.length}</strong></div>
+          <div><span>Source-tagged scan records</span><strong>{workspace.scans.length}</strong></div>
+          <div><span>Complete authenticated scan coverage</span><strong>Not confirmed</strong></div>
+          <div><span>Offline / inaccessible / unsupported assets</span><strong>Track in SOW discovery evidence</strong></div>
         </div>
       </Panel>
     </div>
@@ -2185,18 +2095,6 @@ function Assets({
   ]
   return (
     <div className="stack">
-      <LiveAgentDevicesPanel
-        devices={liveDevices}
-        loading={liveLoading}
-        error={liveError}
-        authRequired={authRequired}
-        canRevoke={canRevoke}
-        onRefresh={onLiveRefresh}
-        onEnroll={onEnroll}
-        onRevoke={(device) => {
-          void device
-        }}
-      />
       <div className="subtle-banner">
         <Icon name="info" size={16} />
         <span>
@@ -2232,9 +2130,6 @@ function Assets({
             </select>
             <Button variant="secondary" icon="upload" onClick={onImport}>
               Import CSV
-            </Button>
-            <Button icon="plus" onClick={onEnroll}>
-              Enroll device
             </Button>
           </div>
         </div>
@@ -2280,11 +2175,10 @@ function Assets({
         {assets.length === 0 ? (
           <EmptyState
             icon="devices"
-            title="No devices enrolled"
-            text="Enroll an authorized Windows device or import an inventory file for validation. Imported records remain separate until a connector checks in."
+            title="No inventory records"
+            text="Import the client inventory for reconciliation, scope validation and authenticated assessment planning."
             action={
               <div className="button-row">
-                <Button onClick={onEnroll}>Enroll first device</Button>
                 <Button variant="secondary" onClick={onImport}>
                   Import inventory
                 </Button>
@@ -2607,14 +2501,6 @@ function ScanResults({
   const assetById = new Map(assets.map((asset) => [asset.id, asset.hostname]))
   return (
     <div className="stack">
-      <LiveAgentScansPanel
-        scans={liveScans}
-        loading={liveLoading}
-        error={liveError}
-        authRequired={authRequired}
-        onRefresh={onLiveRefresh}
-        onEnroll={onEnroll}
-      />
       <div className="filter-bar">
         <div className="filter-label">
           <Icon name="scan" size={17} />
@@ -2654,17 +2540,13 @@ function ScanResults({
           >
             Import scan report
           </Button>
-          <Button variant="secondary" icon="refresh" onClick={onConfigure}>
-            Connector settings
-          </Button>
         </div>
       </div>
       <Panel>
         <div className="subtle-banner">
           <Icon name="info" size={16} />
           <span>
-            Imported reports and browser demonstration records stay separate
-            from the actual API-submitted Windows agent records above.
+            Imported reports and browser demonstration records retain their source labels. Validate authenticated assessment coverage and record scan gaps under SOW workflow.
           </span>
         </div>
         <div className="scan-metrics" aria-label="Scan metric definitions">
@@ -4074,7 +3956,6 @@ function Reports({
           </tr>
         </Table>
       </Panel>
-      <HistoricalReference />
     </div>
   )
 }
