@@ -557,3 +557,43 @@ h1, .panel-heading h2, .metric-value { color: #15385e; }
 .preview-header { background: #102d50; border-bottom-color: #37679d; }
 input[type=checkbox], input[type=radio] { accent-color: #174b85; }
 :where(button, a, input, select, textarea):focus-visible { outline-color: #376ea9; }
+
+/* Presentation readability: larger typography across the PatchGuard wireframe. */
+@media (min-width: 769px) {
+  .app-shell { grid-template-columns: 290px minmax(0, 1fr); }
+  .sidebar { padding-left: 16px; padding-right: 16px; }
+  .content { max-width: 1700px; }
+}
+body { font-size: 18px; line-height: 1.55; }
+.brand strong { font-size: 23px; }
+.brand small { font-size: 16px; }
+.nav-item { font-size: 19px; line-height: 1.45; padding-top: 13px; padding-bottom: 13px; }
+.nav-item i, .sidebar-status button, .status-row small, .user-card small { font-size: 16px; }
+.status-row strong, .user-card strong { font-size: 18px; }
+.breadcrumb, .timezone { font-size: 17px; }
+.eyebrow { font-size: 16px; }
+h1 { font-size: clamp(32px, 2.5vw, 40px); }
+.page-title p { font-size: 19px; }
+.panel-heading h2 { font-size: 23px; }
+.panel-heading p { font-size: 17px; }
+.button { font-size: 18px; min-height: 44px; height: auto; padding: 10px 16px; white-space: normal; }
+.badge { font-size: 15px; padding: 5px 10px; }
+.notice-bar strong { font-size: 18px; }
+.notice-bar span { font-size: 16px; }
+.metric-label, .metric-note { font-size: 15px; }
+.metric-value { font-size: 36px; }
+.workflow-row strong, .window-panel strong { font-size: 18px; }
+.workflow-row small, .window-panel span, .window-panel small { font-size: 16px; }
+.connection-card strong, .coverage-copy strong { font-size: 19px; }
+.connection-card p, .coverage-copy p, .key-values div, .coverage-legend div { font-size: 17px; }
+.section-tabs button { font-size: 18px; }
+.section-tabs span { font-size: 15px; }
+input, select, textarea, table, th, td, summary, label { font-size: 17px; }
+@media (max-width: 768px) {
+  body { font-size: 16px; }
+  .nav-item { font-size: 17px; }
+  h1 { font-size: 30px; }
+  .page-title p { font-size: 17px; }
+  .button { font-size: 16px; }
+  .panel-heading h2 { font-size: 20px; }
+}
