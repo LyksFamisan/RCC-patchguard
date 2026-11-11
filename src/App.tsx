@@ -1,3 +1,4 @@
+import SowWorkflow from "./SowWorkflow"
 import RemoteOperations from "./RemoteOperations"
 import {
   useEffect,
@@ -48,12 +49,13 @@ import {
   type LiveAgentScan,
 } from "./agent-api"
 
-type Page = "Overview" | "Assets" | "Scan results" | "Enroll Device" | "Testing" | "Approvals" | "Deployments" | "Verification" | "SLA monitoring" | "Reports" | "Exceptions & audit" | "Settings"
+type Page = "SOW workflow" | "Overview" | "Assets" | "Scan results" | "Enroll Device" | "Testing" | "Approvals" | "Deployments" | "Verification" | "SLA monitoring" | "Reports" | "Exceptions & audit" | "Settings"
 
 type IconName = "grid" | "devices" | "scan" | "flask" | "check" | "rocket" | "shield" | "clock" | "report" | "history" | "settings" | "plus" | "search" | "bell" | "chevron" | "arrow" | "plug" | "calendar" | "download" | "upload" | "lock" | "info" | "warning" | "close" | "more" | "refresh"
 
 const nav: { label: Page; icon: IconName; divider?: boolean }[] = [
   { label: "Overview", icon: "grid" },
+  { label: "SOW workflow", icon: "report" },
   { label: "Assets", icon: "devices" },
   { label: "Scan results", icon: "scan" },
   { label: "Enroll Device", icon: "lock" },
@@ -652,9 +654,10 @@ function App() {
     [scanImportText, workspace.assets, workspace.scans],
   )
   const pageMeta: Record<Page, [string, string]> = {
+    "SOW workflow": ["AC Mobility SOW workflow", "Eight service criteria, evidence requirements and client decision gates."],
     Overview: [
       "Overview",
-      "Patch management overview · scope and SLA pending client confirmation.",
+      "AC Mobility managed patch service · scope and SLA pending client confirmation.",
     ],
     Assets: [
       "Asset inventory",
@@ -1635,7 +1638,7 @@ function App() {
           <div className="workspace-banner" role="status">
             <Icon name="info" size={16} />
             <span>
-              Demo workflows · Manage approved device jobs under Assets → Remote operations. SLA targets pending approval.
+              AC Mobility SOW · RCC service execution / DOIT approval and risk acceptance. Prototype evidence is separate from connected device jobs.
             </span>
           </div>
           {storageError && (
@@ -1673,6 +1676,7 @@ function App() {
             </div>
           </div>
 
+          {page === "SOW workflow" && <SowWorkflow workspace={workspace} onNavigate={(target) => setPage(target as Page)} />}
           {page === "Overview" && (
             <Overview
               assets={assets}
@@ -1911,14 +1915,14 @@ function Overview({
         <Icon name="info" size={18} />
         <div>
           <strong>
-            Patch management overview
+            AC Mobility managed patch service
           </strong>
           <span>
-            Demo inventory and patch readiness. Review connected devices under Assets.
+            Discover, prioritize, test, obtain DOIT approval, deploy and verify. Track all eight criteria under SOW workflow.
           </span>
         </div>
-        <Button variant="ghost" onClick={() => goTo("Reports")}>
-          View report
+        <Button variant="ghost" onClick={() => goTo("SOW workflow")}>
+          View SOW workflow
         </Button>
       </div>
       <div className="metric-grid">
@@ -4059,7 +4063,7 @@ function Reports({
             <td>
               <strong>Current workspace report</strong>
             </td>
-            <td>Patch management overview</td>
+            <td>AC Mobility managed patch service</td>
             <td>{workspace.assets.length} starting-reference assets</td>
             <td>Current rehearsal role</td>
             <td>{formatTimestamp(new Date().toISOString())}</td>
@@ -5738,7 +5742,7 @@ function exportWorkspaceReport(workspace: WorkspaceState) {
     (item) => item.due && item.due.getTime() < Date.now(),
   )
   const rows: string[][] = [
-    ["report", "Patch management overview"],
+    ["report", "AC Mobility managed patch service"],
     ["reporting_period", "January 2027"],
     [
       "data_mode",
