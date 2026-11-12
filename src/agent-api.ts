@@ -79,7 +79,7 @@ async function request<T>(
     })
   } catch {
     throw new AgentApiError(
-      "PatchGuard API is unreachable. Check that the backend and dashboard proxy are running.",
+      "Workflow API is unreachable. Check that the backend and dashboard proxy are running.",
       0,
       "api_unreachable",
     )
@@ -90,7 +90,7 @@ async function request<T>(
     payload = await response.json()
   } catch {
     throw new AgentApiError(
-      `PatchGuard API returned a non-JSON response (${response.status}).`,
+      `Workflow API returned a non-JSON response (${response.status}).`,
       response.status,
       "invalid_response",
     )
@@ -104,7 +104,7 @@ async function request<T>(
     throw new AgentApiError(
       typeof body.error === "string"
         ? body.error
-        : `PatchGuard API request failed (${response.status}).`,
+        : `Workflow API request failed (${response.status}).`,
       response.status,
       typeof body.code === "string" ? body.code : null,
     )
