@@ -218,34 +218,27 @@ export const roles: UserRole[] = [
   "Read-only Management",
 ]
 
+export function isServerAsset(asset: Pick<Asset, "deviceType" | "osVersion">): boolean {
+  if (/laptop|desktop|workstation|notebook/i.test(asset.deviceType)) return false
+  if (/windows (10|11)(?:\s|$)/i.test(asset.osVersion)) return false
+  return /server/i.test(asset.deviceType) || /server/i.test(asset.osVersion)
+}
+
+function serverScans(scans: ScanRecord[], assets: Asset[]): ScanRecord[] {
+  const ids = new Set(assets.map((asset) => asset.id))
+  return scans.map((scan) => ({ ...scan, affectedAssetIds: scan.affectedAssetIds.filter((id) => ids.has(id)) }))
+    .filter((scan) => scan.affectedAssetIds.length > 0)
+}
+
 export const demoAssets: Asset[] = [
-  ["ACM-0001", "ACM-MNL-LT-041", "10.24.18.41", "Windows 11 23H2 · 22631.4751"],
-  [
-    "ACM-0002",
-    "ACM-MNL-LT-117",
-    "10.24.18.117",
-    "Windows 11 24H2 · 26100.2605",
-  ],
-  ["ACM-0003", "ACM-CEB-WS-022", "10.32.7.22", "Windows 10 22H2 · 19045.5247"],
-  [
-    "ACM-0004",
-    "ACM-MNL-SRV-008",
-    "10.24.2.8",
-    "Windows Server 2022 · 20348.2966",
-  ],
-  ["ACM-0005", "ACM-DVO-LT-014", "10.40.11.14", "Windows 11 23H2 · 22631.4751"],
-  [
-    "ACM-0006",
-    "ACM-MNL-SRV-003",
-    "10.24.2.3",
-    "Windows Server 2019 · 17763.6532",
-  ],
+  ["ACM-0004", "ACM-MNL-SRV-008", "10.24.2.8", "Windows Server 2022 · 20348.2966"],
+  ["ACM-0006", "ACM-MNL-SRV-003", "10.24.2.3", "Windows Server 2019 · 17763.6532"],
 ].map(([id, hostname, ip, osVersion], index) => ({
   id,
   hostname,
   ip,
   osVersion,
-  deviceType: index === 3 || index === 5 ? "Server" : "Laptop",
+  deviceType: "Server",
   businessOwner: unknown,
   department: unknown,
   site: unknown,
@@ -368,7 +361,7 @@ export function createInitialState(
   })
   const seenHostnames = new Set<string>()
   const seenIps = new Set<string>()
-  const assets = [...demoAssets, ...migrated].filter((asset) => {
+  const assets = [...demoAssets, ...migrated].filter(isServerAsset).filter((asset) => {
     const hostname = asset.hostname.toLowerCase()
     const ip = asset.ip.toLowerCase()
     if (seenHostnames.has(hostname) || (ip !== unknown && seenIps.has(ip)))
@@ -380,7 +373,7 @@ export function createInitialState(
   return {
     schemaVersion: 1,
     assets,
-    scans: demoScans,
+    scans: serverScans(demoScans, assets),
     imports: [],
     plans: [],
     approvals: [],
@@ -427,7 +420,8 @@ export function loadWorkspaceState(
           state: {
             ...createInitialState(),
             ...parsed,
-            assets: parsed.assets.map((asset) => ({
+            scans: serverScans(parsed.scans, parsed.assets.filter(isServerAsset)),
+            assets: parsed.assets.filter(isServerAsset).map((asset) => ({
               ...asset,
               thirdPartyApplications:
                 asset.thirdPartyApplications ?? "Not confirmed",
@@ -565,6 +559,10 @@ export function parseAssetCsv(
       errors.push(
         `Row ${line}: IP address is not a valid IPv4 or IPv6 address.`,
       )
+      return
+    }
+    if (!isServerAsset({ deviceType: get(columns.type), osVersion: get(columns.os) })) {
+      errors.push(`Row ${line}: server inventory only. Provide a Server device type or server operating system; laptops and workstations are excluded.`)
       return
     }
     const hostnameKey = hostname.toLowerCase()
