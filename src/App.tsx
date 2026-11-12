@@ -574,8 +574,10 @@ function App() {
     Promise.all([getLiveAgentDevices(), getLiveAgentScans()])
       .then(([devices, scans]) => {
         if (!active) return
-        setLiveDevices(devices.records)
-        setLiveScans(scans.records)
+        const servers = devices.records.filter((device) => /server/i.test(device.os_name))
+        const serverIds = new Set(servers.map((device) => device.id))
+        setLiveDevices(servers)
+        setLiveScans(scans.records.filter((scan) => serverIds.has(scan.asset_id)))
       })
       .catch((error: unknown) => {
         if (!active) return
@@ -654,8 +656,8 @@ function App() {
       "AC Mobility managed patch service · scope and SLA pending client confirmation.",
     ],
     Assets: [
-      "Asset inventory",
-      "Manage discovered devices, scope, ownership, and scan freshness.",
+      "Server inventory",
+      "Manage discovered servers, scope, ownership, and scan freshness.",
     ],
     "Scan results": [
       "Scan results",
@@ -1458,7 +1460,7 @@ function App() {
       return
     }
     const sourceTimestamp = new Date().toISOString()
-    const addedScans = demoScans.map((scan) => ({
+    const addedScans = demoScans.filter((scan) => scan.affectedAssetIds.some((id) => workspace.assets.some((asset) => asset.id === id))).map((scan) => ({
       ...scan,
       id: `demo-${Date.now()}-${scan.updateId}`,
       sourceTimestamp,
@@ -5233,7 +5235,7 @@ function ImportModal({
           value={value}
           onChange={(event) => setValue(event.target.value)}
           placeholder={
-            "hostname,ip,os version,device type,business owner,department,site,criticality,management tool\nACM-LT-001,10.0.0.12,Windows 11 23H2,Laptop,Not confirmed,Finance,Manila,Not confirmed,Not confirmed"
+            "hostname,ip,os version,device type,business owner,department,site,criticality,management tool\nACM-SRV-001,10.0.0.12,Windows Server 2022,Server,Not confirmed,Finance,Manila,Not confirmed,Not confirmed"
           }
         />
         <div className="import-summary">
@@ -5261,7 +5263,7 @@ function ImportModal({
           </div>
         )}
         <small className="field-help">
-          Required: hostname (or device name/computer name). Optional: IP,
+          Required: hostname and Server device type or server OS. Optional: IP,
           operating system/version, device type, business owner, department,
           site, criticality, management tool, scan, reboot and target group.
           Quoted CSV cells are supported.
