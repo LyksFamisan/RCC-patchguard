@@ -434,7 +434,7 @@ function Modal({
       >
         <div className="modal-header">
           <div>
-            <span className="eyebrow">AC Mobility · Workflow</span>
+            <span className="eyebrow">AC Mobility · Dashboard</span>
             <h2>{title}</h2>
           </div>
           <button className="icon-button" onClick={onClose} aria-label="Close">
@@ -557,7 +557,7 @@ function App() {
         setAgentSessionError(
           error instanceof Error
             ? error.message
-            : "Workflow API session could not be checked.",
+            : "PatchGuard API session could not be checked.",
         )
       })
     return () => {
@@ -663,7 +663,7 @@ function App() {
     ],
     "Enroll Device": [
       "Enroll Device",
-      "Authenticate with the Workflow backend to authorize a single Windows device.",
+      "Authenticate with the PatchGuard backend to authorize a single Windows device.",
     ],
     Testing: [
       "Testing",
@@ -1498,10 +1498,10 @@ function App() {
       <aside className={`sidebar ${menuOpen ? "sidebar-open" : ""}`}>
         <div className="brand">
           <div className="brand-mark">
-            <span>W</span>
+            <span>D</span>
           </div>
           <div>
-            <strong>Workflow</strong>
+            <strong>Dashboard</strong>
             <small>AC Mobility</small>
           </div>
         </div>
@@ -1590,7 +1590,7 @@ function App() {
           )}
           <div className="page-title">
             <div>
-              <div className="eyebrow">Workflow</div>
+              <div className="eyebrow">Dashboard</div>
               <h1>{pageMeta[page][0]}</h1>
               <p>{pageMeta[page][1]}</p>
             </div>
@@ -5037,13 +5037,13 @@ function EnrollmentPage({
                 <div>
                   <strong>
                     {sessionStatus === "unavailable"
-                      ? "Workflow API is unavailable"
+                      ? "PatchGuard API is unavailable"
                       : "Sign in required"}
                   </strong>
                   <p>
                     {sessionStatus === "unavailable"
                       ? sessionError
-                      : "Use your existing Workflow account. The session is server-managed; no account or password is stored in this browser."}
+                      : "Use your existing PatchGuard account. The session is server-managed; no account or password is stored in this browser."}
                   </p>
                 </div>
               </div>
@@ -5092,7 +5092,7 @@ function EnrollmentPage({
               <Icon name="download" size={20} />
             </div>
             <div>
-              <strong>RCC Workflow Windows Agent 0.2</strong>
+              <strong>RCC PatchGuard Windows Agent 0.2</strong>
               <p>
                 This is a source package, not a signed EXE or background service.
                 Review the script before running it and keep the files together in
@@ -5131,7 +5131,7 @@ function EnrollmentPage({
         />
         <ol className="agent-steps">
           <li>
-            <strong>Laptop 1 — start the existing Workflow API</strong>
+            <strong>Laptop 1 — start the existing PatchGuard API</strong>
             <code>cd "/Users/rcc/Downloads/Security Services Platform" &amp;&amp; npm run api</code>
           </li>
           <li>
@@ -5443,7 +5443,7 @@ function ReportModal({
       <div className="report-preview">
         <div className="preview-header">
           <div className="brand-mark small">
-            <span>W</span>
+            <span>D</span>
           </div>
           <div>
             <strong>AC Mobility · Patch Operations</strong>
